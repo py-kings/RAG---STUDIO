@@ -1,5 +1,10 @@
 # RAG Studio
-
+[![Python](https://img.shields.io/badge/Python-3.12+-blue?logo=python)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-Web%20Framework-black?logo=flask)](https://flask.palletsprojects.com/)
+[![LangChain](https://img.shields.io/badge/LangChain-RAG-green)](https://www.langchain.com/)
+[![ChromaDB](https://img.shields.io/badge/Vector%20DB-ChromaDB-orange)](https://www.trychroma.com/)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-blue?logo=docker)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ### Enterprise RAG Platform for Secure Document Intelligence
 
 **RAG Studio** is an enterprise-focused Retrieval-Augmented Generation (RAG) platform for document-based question answering.
