@@ -1,0 +1,42 @@
+# --- Core Flask stack ---
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-Migrate==4.0.7
+Flask-WTF==1.2.1
+
+# --- Database (MySQL 8) ---
+PyMySQL==1.1.1
+cryptography==43.0.0
+
+# --- Config / env ---
+python-dotenv==1.0.1
+
+# --- Email validation for auth forms (Phase 3) ---
+email-validator==2.2.0
+
+# --- Document parsing (Phase 6) ---
+PyMuPDF==1.24.9
+python-docx==1.1.2
+
+# --- Embeddings & vector store (Phase 7) ---
+torch==2.5.1
+transformers==4.46.3
+sentence-transformers==3.3.1
+accelerate==1.1.1
+huggingface_hub[hf_xet]
+chromadb==0.5.5
+rank-bm25==0.2.2
+tavily-python
+# --- Gemini + LangChain (Phase 8) ---
+langchain-core==0.3.15
+langchain-google-genai==2.0.7
+
+# --- WSGI server (for later Docker/production phase) ---
+gunicorn==22.0.0
+
+# NOTE: AI/RAG dependencies (langchain, chromadb, sentence-transformers,
+# google-generativeai, PyMuPDF, python-docx) are added starting Phase 6
+# to keep each phase's diff scoped to what that phase introduces.
+# Phase 2 (models) introduced no new dependencies — Flask-SQLAlchemy,
+# Flask-Login, and Flask-Migrate were already in the Phase 1 stack.

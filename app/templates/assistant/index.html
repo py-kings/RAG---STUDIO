@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}
+AI Assistant - Enterprise KnowledgeOS
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+
+    <form method="POST" novalidate>
+
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3">
+
+        {{ form.question(
+            class="form-control" +
+            (" is-invalid" if form.question.errors else "")
+        ) }}
+
+        {% for error in form.question.errors %}
+
+          <div class="invalid-feedback">
+            {{ error }}
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+      {{ form.submit(class="btn btn-primary") }}
+
+    </form>
+
+  </div>
+</div>
+
+
+{% if history %}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+
+  <h6 class="text-muted mb-0">
+    Recent Questions
+  </h6>
+
+  <a
+    href="{{ url_for('assistant.history') }}"
+    class="small"
+  >
+    View full history &raquo;
+  </a>
+
+</div>
+
+
+{% for chat in history %}
+
+<div class="card shadow-sm mb-3">
+
+  <div class="card-body">
+
+    <!-- =====================================================
+         QUESTION
+         ===================================================== -->
+
+    <p class="fw-semibold mb-1">
+      Q: {{ chat.question }}
+    </p>
+
+
+    <!-- =====================================================
+         ANSWER
+         ===================================================== -->
+
+    <div class="chat-response mb-3">
+
+      {{ chat.response | render_markdown | safe }}
+
+    </div>
+
+
+    <!-- =====================================================
+         HUMAN-IN-THE-LOOP FEEDBACK
+         ===================================================== -->
+
+    {% if chat.feedback_status is none %}
+
+      <div class="border-top pt-2 mb-3">
+
+        <span class="small text-muted me-2">
+          Was this answer helpful?
+        </span>
+
+
+        <!-- APPROVE -->
+
+        <form
+          method="POST"
+          action="{{ url_for('assistant.feedback', chat_id=chat.id) }}"
+          class="d-inline"
+        >
+
+          <input
+            type="hidden"
+            name="feedback"
+            value="approved"
+          >
+
+          <button
+            type="submit"
+            class="btn btn-sm btn-outline-success"
+          >
+            👍 Approve
+          </button>
+
+        </form>
+
+
+        <!-- NEEDS HUMAN REVIEW -->
+
+        <form
+          method="POST"
+          action="{{ url_for('assistant.feedback', chat_id=chat.id) }}"
+          class="d-inline"
+        >
+
+          <input
+            type="hidden"
+            name="feedback"
+            value="pending"
+          >
+
+          <button
+            type="submit"
+            class="btn btn-sm btn-outline-warning"
+          >
+            👎 Needs Review
+          </button>
+
+        </form>
+
+      </div>
+
+
+    {% elif chat.feedback_status == "pending" %}
+
+      <div class="border-top pt-2 mb-3">
+
+        <span class="badge bg-warning text-dark">
+          ⏳ Sent for Human Review
+        </span>
+
+      </div>
+
+
+    {% elif chat.feedback_status == "approved" %}
+
+      <div class="border-top pt-2 mb-3">
+
+        <span class="badge bg-success">
+          ✓ Answer Approved
+        </span>
+
+      </div>
+
+
+    {% elif chat.feedback_status == "edited" %}
+
+      <div class="border-top pt-2 mb-3">
+
+        <span class="badge bg-info">
+          ✎ Answer Edited by Reviewer
+        </span>
+
+      </div>
+
+
+    {% elif chat.feedback_status == "rejected" %}
+
+      <div class="border-top pt-2 mb-3">
+
+        <span class="badge bg-danger">
+          ✕ Answer Rejected
+        </span>
+
+      </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         SOURCES
+         ===================================================== -->
+
+    <div class="border-top pt-2">
+
+      <div class="small text-muted">
+
+
+        <!-- INTERNAL DOCUMENT SOURCE -->
+
+        {% if chat.source_document %}
+
+          <div class="mb-2">
+
+            <strong>
+              📄 Internal Source
+            </strong>
+
+            <br>
+
+            <a
+              href="{{ url_for(
+                'document.view',
+                document_id=chat.source_document.id
+              ) }}"
+            >
+              {{ chat.source_document.title }}
+            </a>
+
+            {% if chat.source_page %}
+
+              <span>
+                (page {{ chat.source_page }})
+              </span>
+
+            {% endif %}
+
+          </div>
+
+        {% endif %}
+
+
+        <!-- WEB SOURCES -->
+
+        {% if chat.web_sources %}
+
+          <div>
+
+            <strong>
+              🌐 Web Sources
+            </strong>
+
+            <ul class="mb-0 mt-1 ps-3">
+
+              {% for source in chat.web_sources %}
+
+                <li>
+
+                  <a
+                    href="{{ source.url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ source.title or "Web Source" }}
+                  </a>
+
+                </li>
+
+              {% endfor %}
+
+            </ul>
+
+          </div>
+
+        {% endif %}
+
+
+        <!-- NO SOURCES -->
+
+        {% if not chat.source_document and not chat.web_sources %}
+
+          <span>
+            No specific sources found.
+          </span>
+
+        {% endif %}
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TIMESTAMP
+         ===================================================== -->
+
+    <div class="text-end mt-2">
+
+      <div class="small text-muted">
+
+        {{ chat.created_at.strftime("%b %d, %H:%M") }}
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endfor %}
+
+
+{% else %}
+
+<p class="text-muted">
+  No questions asked yet. Try asking about a policy or procedure above.
+</p>
+
+{% endif %}
+
+{% endblock %}

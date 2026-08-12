@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
+instance/
+logs/*.log
+uploads/*
+!uploads/.gitkeep
+chroma_store/
+parsed_cache/
+.DS_Store
+*.egg-info/
+.pytest_cache/

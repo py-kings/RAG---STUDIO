@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}
+Human Review Queue - Enterprise KnowledgeOS
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h4 class="mb-1">Human Review Queue</h4>
+
+        <p class="text-muted mb-0">
+            Review AI-generated answers that require human validation.
+        </p>
+    </div>
+
+    <a
+        href="{{ url_for('admin.index') }}"
+        class="btn btn-outline-secondary btn-sm"
+    >
+        &laquo; Admin Panel
+    </a>
+
+</div>
+
+
+{% if reviews %}
+
+    {% for chat in reviews %}
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <!-- ================================================= -->
+            <!-- REVIEW HEADER -->
+            <!-- ================================================= -->
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <div>
+
+                    <span class="badge bg-warning text-dark">
+                        ⏳ Pending Review
+                    </span>
+
+                    <span class="text-muted small ms-2">
+                        {{ chat.created_at.strftime("%b %d, %Y %H:%M") }}
+                    </span>
+
+                </div>
+
+                {% if chat.user %}
+
+                    <span class="small text-muted">
+                        Asked by:
+                        <strong>{{ chat.user.full_name }}</strong>
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- USER QUESTION -->
+            <!-- ================================================= -->
+
+            <div class="mb-3">
+
+                <h6 class="text-muted">
+                    User Question
+                </h6>
+
+                <div class="border rounded p-3 bg-light">
+
+                    {{ chat.question }}
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- AI ANSWER -->
+            <!-- ================================================= -->
+
+            <div class="mb-3">
+
+                <h6 class="text-muted">
+                    AI Generated Answer
+                </h6>
+
+                <div class="border rounded p-3">
+
+                    {{ chat.response | render_markdown | safe }}
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- SOURCES -->
+            <!-- ================================================= -->
+
+            <div class="mb-4">
+
+                <h6 class="text-muted">
+                    Sources
+                </h6>
+
+
+                <!-- INTERNAL DOCUMENT SOURCE -->
+
+                {% if chat.source_document %}
+
+                    <div class="small mb-2">
+
+                        📄
+
+                        <a
+                            href="{{ url_for(
+                                'document.view',
+                                document_id=chat.source_document.id
+                            ) }}"
+                        >
+                            {{ chat.source_document.title }}
+                        </a>
+
+                        {% if chat.source_page %}
+
+                            <span>
+                                (page {{ chat.source_page }})
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- WEB SOURCES -->
+
+                {% if chat.web_sources %}
+
+                    <div class="small">
+
+                        🌐 Web Sources
+
+                        <ul class="mt-1">
+
+                            {% for source in chat.web_sources %}
+
+                                <li>
+
+                                    <a
+                                        href="{{ source.url }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {{ source.title or "Web Source" }}
+                                    </a>
+
+                                </li>
+
+                            {% endfor %}
+
+                        </ul>
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- NO SOURCES -->
+
+                {% if not chat.source_document and not chat.web_sources %}
+
+                    <span class="small text-muted">
+                        No sources recorded.
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- HUMAN REVIEW ACTIONS -->
+            <!-- ================================================= -->
+
+            <div class="border-top pt-3">
+
+                <h6 class="mb-3">
+                    Human Review
+                </h6>
+
+
+                <!-- ================================================= -->
+                <!-- APPROVE -->
+                <!-- ================================================= -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.approve_review',
+                        chat_id=chat.id
+                    ) }}"
+                    class="d-inline"
+                >
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        onclick="return confirm('Approve this answer?');"
+                    >
+                        ✓ Approve Answer
+                    </button>
+
+                </form>
+
+
+                <!-- ================================================= -->
+                <!-- REJECT -->
+                <!-- ================================================= -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.reject_review',
+                        chat_id=chat.id
+                    ) }}"
+                    class="mt-3"
+                >
+
+                    <label class="form-label">
+                        Rejection Reason
+                    </label>
+
+                    <textarea
+                        name="human_feedback"
+                        class="form-control mb-2"
+                        rows="2"
+                        placeholder="Explain why this answer should be rejected..."
+                    ></textarea>
+
+                    <button
+                        type="submit"
+                        class="btn btn-outline-danger"
+                        onclick="return confirm('Reject this answer?');"
+                    >
+                        ✕ Reject Answer
+                    </button>
+
+                </form>
+
+
+                <!-- ================================================= -->
+                <!-- EDIT -->
+                <!-- ================================================= -->
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'admin.edit_review',
+                        chat_id=chat.id
+                    ) }}"
+                    class="mt-4"
+                >
+
+                    <label class="form-label">
+                        Edit AI Answer
+                    </label>
+
+                    <textarea
+                        name="reviewed_answer"
+                        class="form-control mb-2"
+                        rows="7"
+                    >{{ chat.response }}</textarea>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        ✎ Save Edited Answer
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+
+{% else %}
+
+    <!-- ================================================= -->
+    <!-- EMPTY REVIEW QUEUE -->
+    <!-- ================================================= -->
+
+    <div class="card shadow-sm">
+
+        <div class="card-body text-center py-5">
+
+            <div class="display-6 mb-3">
+                ✓
+            </div>
+
+            <h5>
+                No Pending Reviews
+            </h5>
+
+            <p class="text-muted mb-0">
+                All AI answers have been reviewed.
+            </p>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

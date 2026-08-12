@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel - Enterprise KnowledgeOS{% endblock %}
+{% block content %}
+
+<h4 class="mb-3">Admin Panel</h4>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <div class="text-muted small">Total Users</div>
+      <div class="fs-2 fw-bold">{{ stats.total_users }}</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <div class="text-muted small">Total Documents</div>
+      <div class="fs-2 fw-bold">{{ stats.total_documents }}</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <div class="text-muted small">Total Chats</div>
+      <div class="fs-2 fw-bold">{{ stats.total_chats }}</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card shadow-sm h-100"><div class="card-body">
+      <div class="text-muted small">Failed Queries</div>
+      <div class="fs-2 fw-bold">{{ stats.failed_queries }}</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h6 class="card-title text-muted">Users by Role</h6>
+        <ul class="list-group list-group-flush">
+          {% for role_name, count in role_counts %}
+          <li class="list-group-item d-flex justify-content-between px-0">
+            <span>{{ role_name }}</span>
+            <span class="badge bg-secondary">{{ count }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h6 class="card-title text-muted">Manage</h6>
+        <div class="d-flex flex-column gap-2">
+          <a href="{{ url_for('admin.users') }}" class="btn btn-outline-primary text-start">User &amp; Role Management</a>
+          <a href="{{ url_for('document.index') }}" class="btn btn-outline-primary text-start">Document Management</a>
+          <a href="{{ url_for('admin.logs') }}" class="btn btn-outline-primary text-start">Audit Logs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

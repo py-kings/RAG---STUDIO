@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Documents - Enterprise KnowledgeOS{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Documents</h4>
+  <a href="{{ url_for('document.upload') }}" class="btn btn-primary btn-sm">Upload Document</a>
+</div>
+
+<form method="GET" class="row g-2 mb-3">
+  <div class="col-auto flex-grow-1">
+    <input type="text" name="q" class="form-control" placeholder="Search by title or filename"
+           value="{{ query }}">
+  </div>
+  <div class="col-auto">
+    <select name="type" class="form-select">
+      <option value="" {% if not file_type %}selected{% endif %}>All types</option>
+      <option value="pdf" {% if file_type == "pdf" %}selected{% endif %}>PDF</option>
+      <option value="docx" {% if file_type == "docx" %}selected{% endif %}>DOCX</option>
+      <option value="txt" {% if file_type == "txt" %}selected{% endif %}>TXT</option>
+    </select>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-outline-secondary">Search</button>
+  </div>
+</form>
+
+{% if documents %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Uploaded By</th>
+        <th>Status</th>
+        <th>Uploaded</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for doc in documents %}
+      <tr>
+        <td><a href="{{ url_for('document.view', document_id=doc.id) }}">{{ doc.title }}</a></td>
+        <td><span class="badge bg-secondary">{{ doc.file_type|upper }}</span></td>
+        <td>{{ doc.uploaded_by.full_name }}</td>
+        <td>
+          {% set badge_class = 'success' if doc.status == 'indexed' else ('danger' if doc.status == 'failed' else 'warning text-dark') %}
+          <span class="badge bg-{{ badge_class }}">
+            {{ doc.status }}
+          </span>
+        </td>
+        <td>{{ doc.created_at.strftime("%b %d, %Y") }}</td>
+        <td class="text-end">
+          <a href="{{ url_for('document.view', document_id=doc.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">No documents found.</p>
+{% endif %}
+
+{% endblock %}

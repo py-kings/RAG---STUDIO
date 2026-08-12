@@ -1,0 +1,9 @@
+/* Enterprise KnowledgeOS - global styles */
+
+body {
+    background-color: #f4f6f9;
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
