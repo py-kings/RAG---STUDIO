@@ -42,6 +42,10 @@ It combines **semantic vector search, BM25 keyword search, Reciprocal Rank Fusio
 
 # 🏗️ System Architecture
 
+## 🏗️ System Architecture
+
+![RAG Studio Architecture](docs/architecture.png)
+
 ```text
                          ┌─────────────────────┐
                          │       User          │
